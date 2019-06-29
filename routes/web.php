@@ -30,6 +30,8 @@ Route::get('/periksa/{id}', 'PemeriksaanController@create')->name('periksa');
 Route::post('/kirim-data-pemeriksaan' ,'PemeriksaanController@store')->name('kirim-data-pemeriksaan');
 Route::match(['put', 'patch'], 'proses-lab/{id}', 'PemeriksaanController@update')->name('proses-lab');
 
+Route::get('/data/{month}/{year}', 'PemeriksaanController@data')->name('data-pemeriksaan');
+Route::get('/grafik/{month}/{year}', 'PemeriksaanController@grafik')->name('grafik-pemeriksaan');
 
 Route::middleware('role:pendaftaran')->group(function(){
     Route::get('/pendaftaran', 'PendaftaranController@home')->name('pendaftaran.home');
@@ -40,4 +42,11 @@ Route::middleware('role:pendaftaran')->group(function(){
     Route::get('/hapus-data-pasien/{id}', 'PendaftaranController@destroy')->name('pendaftaran.delete');
     Route::post('/update-data-pasien/{id}', 'PendaftaranController@update')->name('pendaftaran.update');
     Route::post('tambah-pasien','PendaftaranController@store')->name('pendaftaran.store');
+});
+
+// Kasir
+Route::middleware('role:kasir')->group(function(){
+Route::resource('kasir', 'KasirController');
+Route::get('riwayat/kasir', 'KasirController@riwayat')->name('kasir.riwayat');
+Route::get('kasir/print/{id}', 'KasirController@print')->name('kasir.print');
 });

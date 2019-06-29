@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Input;
 use Illuminate\Http\Request;
 use App\RekamMedis;
 use App\HasilPemeriksaan;
+use App\KategoriPemeriksaan;
+use App\JenisPemeriksaan;
 use App\Pasien;
 
 class PemeriksaanController extends Controller
@@ -33,6 +35,50 @@ class PemeriksaanController extends Controller
       return view ('laboratorium.home');
     }
 
+    public function data($month, $year){
+
+      $jenisPemeriksaan = JenisPemeriksaan::has('hasil')->with('hasil')
+      ->whereYear('created_at', '=', $year)
+      ->whereMonth('created_at', '=', $month)
+      ->get();
+      // $hasilPemeriksaan = HasilPemeriksaan::with('jenis')->get();
+
+      return view('laboratorium.data-pemeriksaan',compact('month','year', 'jenisPemeriksaan'));
+    }
+
+    public function grafik($month, $year){
+
+      // $jenisPemeriksaan = JenisPemeriksaan::has('hasil')->with('hasil')
+      // ->whereYear('created_at', '=', $year)
+      // ->whereMonth('created_at', '=', $month)
+      // ->get()->toArray();
+      // $jenisPemeriksaan = array_column($jenisPemeriksaan, 'nama_jenis');
+      
+      $countPemeriksaan = JenisPemeriksaan::has('hasil')->with('hasil')
+      ->whereYear('created_at', '=', $year)
+      ->whereMonth('created_at', '=', $month)
+      ->get();
+      $key = array();
+      $value = array();
+      foreach ($countPemeriksaan as $h) {
+        $key[] = $h->nama_jenis;
+        $value[] = $h->hasil->count();
+      }
+      // $click = Click::select(DB::raw("SUM(numberofclick) as count"))
+      //     ->orderBy("created_at")
+      //     ->groupBy(DB::raw("year(created_at)"))
+      //     ->get()->toArray();
+      // $click = array_column($click, 'count');
+
+      // $data = $jenisPemeriksaan->toArray();
+      // print_r($jenisPemeriksaan);
+      // $hasilPemeriksaan = HasilPemeriksaan::with('jenis')->get();
+
+      return view('laboratorium.grafik-pemeriksaan',compact('month','year'))
+      ->with('key',json_encode($key))
+      ->with('nilai',json_encode($value,JSON_NUMERIC_CHECK));
+    }
+
     public function history(Request $request)
     {           
         $rekamMedis = RekamMedis::
@@ -51,9 +97,12 @@ class PemeriksaanController extends Controller
     {
         $rekamMedis = new RekamMedis;
         $rekamMedis->id_pasien = $id;
-        $rekamMedis->status = "cek Lab";
+        $rekamMedis->status = "kasir";
         $rekamMedis->save();
-        return view('laboratorium.form-pemeriksaan',compact('rekamMedis'));
+        
+        $kategoriPemeriksaan = KategoriPemeriksaan::with('jenis')->get();
+        
+        return view('laboratorium.form-pemeriksaan',compact('rekamMedis', 'kategoriPemeriksaan'));
     }
 
     /**
@@ -68,8 +117,8 @@ class PemeriksaanController extends Controller
         $jumlah = count($request->input('periksa'));
         for($i=0;$i<$jumlah;$i++){
             $hasilPemeriksaan = new HasilPemeriksaan;
-            $hasilPemeriksaan->id_rekam_medis = $request->input('id_rekam_medis');
-            $hasilPemeriksaan->jenis_pemeriksaan = $request->input('periksa')[$i];
+            $hasilPemeriksaan->rekam_medis_id = $request->input('rekam_medis_id');
+            $hasilPemeriksaan->jenis_pemeriksaan_id = $request->input('periksa')[$i];
             $hasilPemeriksaan->save();
         }
         return redirect()->route('pendaftaran.home')->with('status', 'Pasien berhasil diproses ke Laboratorium!');
@@ -84,7 +133,7 @@ class PemeriksaanController extends Controller
     public function show($id)
     {
         
-        $hasilPemeriksaan = DB::table('hasil_pemeriksaan')->where('id_rekam_medis', $id)->get();
+        $hasilPemeriksaan = HasilPemeriksaan::with('jenis')->where('rekam_medis_id', $id)->get();
         $rekamMedis = DB::table('rekam_medis')->where('id', $id)->first();
         
         if(!$rekamMedis->enter_time){
@@ -105,7 +154,7 @@ class PemeriksaanController extends Controller
     public function print($id)
     {
         
-        $hasilPemeriksaan = DB::table('hasil_pemeriksaan')->where('id_rekam_medis', $id)->get();
+        $hasilPemeriksaan = HasilPemeriksaan::with('jenis')->where('rekam_medis_id', $id)->get();
         $rekamMedis = DB::table('rekam_medis')->where('id', $id)->first();
         
         // dd($rekamMedis[]);
@@ -123,7 +172,7 @@ class PemeriksaanController extends Controller
      */
     public function edit($id)
     {
-        $hasilPemeriksaan = DB::table('hasil_pemeriksaan')->where('id_rekam_medis', $id)->get();
+        $hasilPemeriksaan = HasilPemeriksaan::with('jenis')->where('rekam_medis_id', $id)->get();
         $rekamMedis = DB::table('rekam_medis')->where('id', $id)->first();
         $pasien = DB::table('pasiens')->where('id', $rekamMedis->id_pasien)->get();
         return view('laboratorium.edit', ['hasilPemeriksaan' => $hasilPemeriksaan, 'pasien'=>$pasien[0], 'rekamMedis'=>$rekamMedis]);
@@ -139,7 +188,7 @@ class PemeriksaanController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $hasilPemeriksaan = DB::table('hasil_pemeriksaan')->where('id_rekam_medis', $id)->get();
+        $hasilPemeriksaan = DB::table('hasil_pemeriksaan')->where('rekam_medis_id', $id)->get();
         
         foreach ($hasilPemeriksaan as $data) {
           

@@ -9,4 +9,10 @@ class RekamMedis extends Model
 {
     use Sortable;
     protected $table = 'rekam_medis';
-}
+
+    public function hasilpem()
+    {
+      return $this->hasMany('App\HasilPemeriksaan');
+    }
+
+  }

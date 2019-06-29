@@ -7,33 +7,19 @@
   </a>
 </li>
 <li class="nav-item">
-  <a class='sidebar-link' href="{{ route('list-cek') }}" default>
+  <a class='sidebar-link' href="{{ route('kasir.index') }}" default>
       <span class="icon-holder">
           <i class="ti-wallet"></i>
       </span>
-      <span class="title">Data Pasien</span>
+      <span class="title">Daftar Pembayaran</span>
   </a>
 </li>
 <li class="nav-item">
-  <a class='sidebar-link' href="{{ route('history') }}" default>
+  <a class='sidebar-link' href="{{ route('kasir.riwayat') }}" default>
       <span class="icon-holder">
           <i class="ti-wallet"></i>
       </span>
-      <span class="title">Riwayat Pasien</span>
-  </a>
-</li>
-@php
-  date_default_timezone_set('Asia/Jakarta');
-  $month = date("m"); 
-  $year = date("Y"); 
-@endphp
-
-<li class="nav-item">
-  <a class='sidebar-link' href="{{ route('data-pemeriksaan',[$month ,$year]) }}" default>
-      <span class="icon-holder">
-          <i class="ti-credit-card"></i>
-      </span>
-      <span class="title">Informasi Lab</span>
+      <span class="title">Riwayat Pembayaran</span>
   </a>
 </li>
 

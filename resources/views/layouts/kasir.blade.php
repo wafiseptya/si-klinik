@@ -8,7 +8,7 @@
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Laboratorium') }}</title>
+    <title>Kasir</title>
 
     <!-- Styles -->
 	<link href="{{ mix('/css/app.css') }}" rel="stylesheet"> 
@@ -22,7 +22,7 @@
 
     <div>
         <!-- #Left Sidebar ==================== -->
-        @include('partials.lab-sidebar')
+        @include('partials.kasir-sidebar')
 
         <!-- #Main ============================ -->
         <div class="page-container">

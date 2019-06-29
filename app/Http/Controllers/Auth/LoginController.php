@@ -46,6 +46,10 @@ class LoginController extends Controller
         {
             return redirect('/pendaftaran');
         }
+        else if(auth()->user()->hasRole('kasir'))
+        {
+            return redirect('/kasir');
+        }
         else
         {
             return redirect('/home');

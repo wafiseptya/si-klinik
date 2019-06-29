@@ -14,7 +14,7 @@
                   {{ method_field('PUT') }}
                   @foreach ($hasilPemeriksaan as $h)
                     <div class="form-group">
-                      <label for="{{$h->id}}">{{$h->jenis_pemeriksaan}}</label>
+                      <label for="{{$h->id}}">{{$h->jenis->nama_jenis}}</label>
                       <input type="text" class="form-control" name="{{$h->id}}" id="{{$h->id}}" placeholder="Masukkan hasil pemeriksaan">
                     </div>     
                   @endforeach       
